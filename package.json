@@ -1,0 +1,13 @@
+{
+  "name": "civitai-server",
+  "version": "1.0.0",
+  "description": "This is a server for Civitas, a web application that allows users to create and manage reports, and blogs to help people visiting different cities in building their plans.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
