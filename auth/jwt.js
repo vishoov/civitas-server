@@ -13,6 +13,11 @@ function signToken(payload){
     return token;
 }
 
+function verifyToken(token){
+    return jwt.verify(token, SECRET);
+}
+
 export {
-    signToken
+    signToken,
+    verifyToken
 }

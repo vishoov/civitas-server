@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.models.js';
+import { signToken } from '../auth/jwt.js';
 
 const getAllUsers = async (req, res) => {
     try{
@@ -117,7 +118,7 @@ const loginUser = async (req, res) => {
         if(!user){
             return res.status(401).json({
                 success: false,
-                message: "Invalid email and password"
+                message: "User not found"
             })
         }
 
@@ -125,19 +126,37 @@ const loginUser = async (req, res) => {
             return res.status(403).json({
                 success: false,
                 message: "Your account is inactive"
+            });
+        }
+
+        const isMatch = await user.comparePassword(password);
+        if(!isMatch){
+            return res.status(404).json({
+                message: "Password Incorrect"
             })
         }
+        
+        const token = signToken({
+            email: user.email,
+            role: user.role
+        });
 
         res.status(200).json({
             success: true,
             message: "Login Successful",
-            user
-        })
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                token
+            }
+        });
+
     }catch(err){
         res.status(500).json({
             success: false,
-            message: "Login Failed",
-            error: error.message
+            message: "Login Failed, Interval server error",
+            error: err.message
         })
     }
 }

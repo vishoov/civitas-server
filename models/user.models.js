@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: [true, "Username is required"],
@@ -16,10 +17,35 @@ const UserSchema = new mongoose.Schema({
         lowercase: true,
         match:[/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please fill a valid email address"]
     },
-    password: {
-        type: String,
-        required: [true, "Password is required"],
-        minLength: [6, "Password must be at least 6 characters long"]
+    password:{
+        type:String,
+        required:[true, "No work without any password"],
+        minLength: 8,
+        validate:{
+            validator: function (password){
+                password= password.trim();
+                if(password.length<8){
+                    return 'Password must be at least 8 characters long'
+                }
+                let hasUpperCase = false;
+                let hasSpecialChar = false;
+                let hasNumber = false;
+                for(let i=0; i<password.length; i++){
+                    const code = password[i];
+                    if(code>='A' && code<='Z'){
+                        hasUpperCase=true;
+                    }
+                    else if(code =='@' || code=='#' || code=='$' || code=='%' || code=='&' || code=='*'){
+                        hasSpecialChar=true;
+                    } 
+                    else if (code>='0' && code<='9'){
+                        hasNumber=true;
+                    }
+                }
+                return hasUpperCase && hasSpecialChar && hasNumber;
+            },
+            message:"Invalid Password"
+        }
     },
     role:{
         type: String,
@@ -42,6 +68,18 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
+//password salt+hashing
+userSchema.methods.comparePassword = async function(password){
+    console.log("Compare the password");
+    return await bcrypt.compare(password, this.password);
+}
 
-const User = mongoose.model("User", UserSchema);
+userSchema.pre('save', async ()=>{
+    if(!this.isModified("password")){
+        return;
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+})
+const User = mongoose.model("User", userSchema);
 export default User;

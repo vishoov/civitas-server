@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.models.js';
+import { verifyToken } from '../auth/jwt.js';
 
 const authMW = async (req, res) => {
     try{
@@ -10,7 +11,8 @@ const authMW = async (req, res) => {
                 message: "Invalid token, not found"
             });
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = verifyToken(token);
+        console.log(decoded);
         const user = await User.findById(decoded.id).select('-password');
         if(!user){
             return res.status(404).json({
