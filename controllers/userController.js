@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.models.js';
+import { signToken } from '../auth/jwt.js';
 
 const getAllUsers = async (req, res) => {
     try{
@@ -127,17 +128,24 @@ const loginUser = async (req, res) => {
                 message: "Your account is inactive"
             })
         }
+        const token=signToken({id: user.id,email: user.email})
+
+        res.cookie("token",token, {
+            maxAge: 30*60*60,
+            httpOnly: true,
+        } )
 
         res.status(200).json({
             success: true,
             message: "Login Successful",
-            user
+            user,
         })
     }catch(err){
+        console.log(err)
         res.status(500).json({
             success: false,
             message: "Login Failed",
-            error: error.message
+            error: err.message
         })
     }
 }
