@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.models.js';
 
-const authMW = async (req, res) => {
+const authMW = async (req, res, next) => {
     try{
         const token = req.cookies.token;
         if(!token){
@@ -10,7 +10,7 @@ const authMW = async (req, res) => {
                 message: "Invalid token, not found"
             });
         }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN);
         const user = await User.findById(decoded.id).select('-password');
         if(!user){
             return res.status(404).json({
@@ -29,6 +29,7 @@ const authMW = async (req, res) => {
         req.user = user;
         next();
     }catch(err){
+        console.log(err.message)
         res.status(500).json({
             success: false,
             message: "Invalid or expired token"       

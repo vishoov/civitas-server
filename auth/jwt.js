@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.JWT_SECRET;
 function signToken(payload){
+    const SECRET = process.env.JWT_TOKEN;
+    console.log(SECRET)
     const token = jwt.sign(
         payload,
         SECRET,
