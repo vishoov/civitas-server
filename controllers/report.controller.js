@@ -57,5 +57,37 @@ export const createReport= async (req, res)=>{
 }
 
 export const filterReport= async (req, res)=>{
-    
+        
+}
+
+export const singleReport =async (req, res)=>{
+    let {id}= req.params;
+
+    try{
+
+        let report= await Report.findOne({_id: id});
+        if(!report)
+            return res.status(400).json({
+                success: false,
+                error: "Report does'nt exist"
+        });
+        
+        res.status(200).json(
+            {
+                success: true,
+                report
+            }
+        )
+    }
+    catch(err){
+        console.log(err.message);
+        res.status(500).json(
+            {
+                success: false,
+                error: "Server could'nt respond"
+            }
+        )
+    }
+
+
 }
