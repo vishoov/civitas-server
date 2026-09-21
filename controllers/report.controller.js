@@ -57,12 +57,11 @@ export const createReport= async (req, res)=>{
 }
 
 export const filterReport= async (req, res)=>{
-    // let {_id}= req.user;
-    let { pg_no=1 }= req.params;
-    
-    
+    let { pg_no }= req.params;
+    pg_no=pg_no==0?1:pg_no;
+        
     try{
-        let { pincode, district, state} = req.body;
+        let { pincode, district, state, status} = req.body;
         let parameters={};
         if(pincode.length)
             parameters.pincode= pincode;
@@ -70,6 +69,11 @@ export const filterReport= async (req, res)=>{
             parameters.district= district;
         if(state.length)
             parameters.state= state;
+        if(status.length){
+            if(!['pending', 'verified', 'rejected', 'resolved'].includes(status))
+                return res.status(400).json({success: false, error: "Invalid Report Status"})
+            parameters.status= status;
+        }
         let filtered_report= await Report.find(parameters).skip(5*(pg_no-1)).limit(5*pg_no);
         if(!filtered_report)
             res.status(400).json({
@@ -126,4 +130,8 @@ export const singleReport =async (req, res)=>{
     }
 
 
+}
+
+export const aggregateReport= async (req, res)=>{
+    
 }
