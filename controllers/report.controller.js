@@ -58,6 +58,7 @@ export const createReport= async (req, res)=>{
 
 export const filterReport= async (req, res)=>{
     // let {_id}= req.user;
+    let { pg_no=1 }= req.params;
     
     
     try{
@@ -69,8 +70,7 @@ export const filterReport= async (req, res)=>{
             parameters.district= district;
         if(state.length)
             parameters.state= state;
-
-        let filtered_report= await Report.find(parameters);
+        let filtered_report= await Report.find(parameters).skip(5*(pg_no-1)).limit(5*pg_no);
         if(!filtered_report)
             res.status(400).json({
         success: false,
