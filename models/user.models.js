@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
         enum: ["User", "Admin"],
         default: "User"
     },
+    age: {
+        type: Number
+    },
     districtCode: {
         type: String,
         default: null
