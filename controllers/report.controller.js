@@ -57,27 +57,43 @@ export const createReport= async (req, res)=>{
 }
 
 export const filterReport= async (req, res)=>{
+    console.log('filter called')
     const PAGE_SIZE= 5;
     let pg_no= Number(req.params.pg_no);
     if(!Number.isFinite(pg_no) || pg_no < 1)
         pg_no= 1;
-
+    
     try{
         let { pincode, district, state, status} = req.body ?? {};
-        let parameters={};
-        if(pincode)
-            parameters.pincode= pincode;
-        if(district)
-            parameters.district= district;
-        if(state)
-            parameters.state= state;
-        if(status){
-            if(!['pending', 'verified', 'rejected', 'resolved'].includes(status))
-                return res.status(400).json({success: false, error: "Invalid Report Status"})
-            parameters.status= status;
-        }
-        let filtered_report= await Report.find(parameters).skip(PAGE_SIZE*(pg_no-1)).limit(PAGE_SIZE);
+        // console.log(state, status)
+        // let parameters={};
+        // if(pincode)
+        //     parameters.pincode= pincode;
+        // if(district)
+        //     parameters.district= district;
+        // if(state)
+        //     parameters.state= state;
+    
+        // if(status){
+        //     // if(!['pending', 'verified', 'rejected', 'resolved'].includes(status))
+        //     //     return res.status(400).json({success: false, error: "Invalid Report Status"})
+        //     parameters.status= status;
 
+        // }
+        // console.log(parameters)
+        const filter = {};
+        if(pincode)
+            filter.pincode = pincode;
+        if(district)
+            filter.district = district;
+        if(state)
+            filter.state = state;
+        if(status)
+            filter.status = status;
+
+        let filtered_report= await Report.find(filter)
+            .skip(PAGE_SIZE*(pg_no-1)).limit(PAGE_SIZE);
+        console.log(status, state)
         res.status(200).json(
             {
                 success: true,

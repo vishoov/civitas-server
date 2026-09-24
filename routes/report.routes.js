@@ -5,7 +5,7 @@ import authMW from "../middleware/authMiddleware.js";
 const report_Router= express.Router();
 
 report_Router.get("/all", allReports)
-report_Router.post("/reports/filter/:pg_no", authMW, filterReport);
+report_Router.post("/reports/filter/:pg_no", filterReport);
 report_Router.post("/reports",authMW,  createReport);
 report_Router.get("/reports/:id", singleReport);
 
