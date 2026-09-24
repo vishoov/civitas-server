@@ -57,29 +57,26 @@ export const createReport= async (req, res)=>{
 }
 
 export const filterReport= async (req, res)=>{
-    let { pg_no }= req.params;
-    pg_no=pg_no==0?1:pg_no;
-        
+    const PAGE_SIZE= 5;
+    let pg_no= Number(req.params.pg_no);
+    if(!Number.isFinite(pg_no) || pg_no < 1)
+        pg_no= 1;
+
     try{
-        let { pincode, district, state, status} = req.body;
+        let { pincode, district, state, status} = req.body ?? {};
         let parameters={};
-        if(pincode.length)
+        if(pincode)
             parameters.pincode= pincode;
-        if(district.length)
+        if(district)
             parameters.district= district;
-        if(state.length)
+        if(state)
             parameters.state= state;
-        if(status.length){
+        if(status){
             if(!['pending', 'verified', 'rejected', 'resolved'].includes(status))
                 return res.status(400).json({success: false, error: "Invalid Report Status"})
             parameters.status= status;
         }
-        let filtered_report= await Report.find(parameters).skip(5*(pg_no-1)).limit(5*pg_no);
-        if(!filtered_report)
-            res.status(400).json({
-        success: false,
-        error: "Could'nt find any Reports"
-        })
+        let filtered_report= await Report.find(parameters).skip(PAGE_SIZE*(pg_no-1)).limit(PAGE_SIZE);
 
         res.status(200).json(
             {
@@ -92,7 +89,7 @@ export const filterReport= async (req, res)=>{
         console.log(err.message);
         res.status(500).json(
             {
-                success: true,
+                success: false,
                 error: "Server Error!: Reports not found"
             }
         )
@@ -130,6 +127,22 @@ export const singleReport =async (req, res)=>{
     }
 
 
+}
+
+
+export const allReports = async (req, res)=>{
+    const reports = await Report.find();
+    console.log('route called');
+    if(!reports){
+        return res.status(500).json({
+            message:"Some error in getting the reports"
+        })
+    }
+
+    return res.status(200).json({
+        message:"Reports Fetched Successfully",
+        reports
+    })
 }
 
 export const aggregateReport= async (req, res)=>{
