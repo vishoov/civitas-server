@@ -135,3 +135,26 @@ export const singleReport =async (req, res)=>{
 export const aggregateReport= async (req, res)=>{
     
 }
+
+export const getAll= async(req, res)=>{
+    try{
+        console.log("Working!!")
+        let reports= await Report.find();
+
+        res.status(200).json(
+            {
+                success: true,
+                reports
+            }
+        )
+    }
+    catch(err){
+        console.log(err.message);
+        res.status(500).json(
+            {
+                success: false,
+                error: "Server Error: Couldnt fetch the reports"
+            }
+        )
+    }
+}
