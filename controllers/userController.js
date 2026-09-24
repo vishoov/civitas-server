@@ -64,6 +64,37 @@ const getUserById = async (req, res) => {
     }
 }
 
+const deactivateAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { isActive: false },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Account deactivated successfully",
+    });
+  } catch (error) {
+    console.error("Deactivate account error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to deactivate account",
+    });
+  }
+};
+
 const registerUser = async (req, res) =>{
     try{
         const {username, email, password, age} = req.body;
@@ -125,7 +156,7 @@ const loginUser = async (req, res) => {
         if(!user.isActive){
             return res.status(403).json({
                 success: false,
-                message: "Your account is inactive"
+                message: "Your account has been deactivated"
             })
         }
         const token=signToken({id: user.id,email: user.email})
@@ -271,5 +302,6 @@ export {
     logoutUser,
     updateUser,
     updateById,
-    deleteUser
+    deleteUser,
+    deactivateAccount
 };
