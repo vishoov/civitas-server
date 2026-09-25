@@ -1,10 +1,12 @@
 import Report from "../models/reports.model.js";
+import fs from "fs";
+import cloudinary from "../services/cloudinary.js";
 
 
 export const createReport= async (req, res)=>{
     
     let {_id, username, }= req.user;
-    let {title, description, pincode, district, state, photoUrl, status }= req.body;
+    let {title, description, pincode, district, state, status }= req.body;
     let userId= _id;
 
     // console.log(username, userId, title, description, pincode, district, state );
@@ -17,6 +19,13 @@ export const createReport= async (req, res)=>{
     })
 
     try{
+
+        let photoUrl=null;
+        if(req.file){
+            const result= await cloudinary.uploader.upload(req.file.path, {folder: "reports"});
+            photoUrl=result.secure_url;
+            fs.unlinkSync(req.file.path);
+        }
 
         let createdReport= await Report.create(
             {
