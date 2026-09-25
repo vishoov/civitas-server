@@ -1,11 +1,17 @@
 import Report from "../models/reports.model.js";
-
+import cloudinary from "../services/cloudinary.js";
+import fs from 'fs';
 
 export const createReport= async (req, res)=>{
     
     let {_id, username, }= req.user;
     let {title, description, pincode, district, state, photoUrl, status }= req.body;
     let userId= _id;
+    console.log(req.file, req.files);
+
+    //cloudinary logic 
+
+
 
     // console.log(username, userId, title, description, pincode, district, state );
 
@@ -17,6 +23,16 @@ export const createReport= async (req, res)=>{
     })
 
     try{
+
+        let photoUrl = null;
+
+        if(req.file){
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder:"reports"
+            })
+            photoUrl = result.secure_url;
+            fs.unlinkSync(req.file.path);
+        }
 
         let createdReport= await Report.create(
             {
@@ -34,7 +50,7 @@ export const createReport= async (req, res)=>{
 
         if(!createdReport)
             throw new Error("Server Error:  Report not created")
-
+        
         res.status(201).json(
             {
                 success: true, 
@@ -55,6 +71,9 @@ export const createReport= async (req, res)=>{
 
 
 }
+
+
+
 
 export const filterReport= async (req, res)=>{
     console.log('filter called')

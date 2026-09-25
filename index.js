@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import connectDB from './config/db.js';
 import userRouter from './routes/user.routes.js';
@@ -7,7 +7,6 @@ import cookie from 'cookie-parser';
 import report_Router from "./routes/report.routes.js";
 
 const app = express();
-dotenv.config()
 app.use(cors(
   {
     origin: true,
