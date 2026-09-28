@@ -1,5 +1,5 @@
 import express from 'express';
-import User from '../models/User.models.js';
+import User from '../models/user.models.js';
 import { signToken } from '../auth/jwt.js';
 
 const getAllUsers = async (req, res) => {
